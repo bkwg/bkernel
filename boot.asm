@@ -56,7 +56,7 @@ _main:
     ; load the GDT
 	xor     ax, ax
 	mov     ds, ax
-	lgdt    [ds:gdt]
+	lgdt    [ds:gdt.pointer]
 
     ; set cr0.PE
 	mov     eax, cr0
@@ -142,9 +142,10 @@ print_string:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 align 8
-gdt_base:
+gdt:
 
     ; NULL SEGMENT
+    .null:
 	dq 0x0000000000000000
 
     ; CODE SEGMENT DPL = 0
@@ -154,7 +155,7 @@ gdt_base:
         ;p_dpl_type      db  9Ah ; 0b10011010
         ;g_d_0_avl       db  CFh ; 0b11001111
         ;base3124        db  00 
-
+    .code:
 	dq 0x00CF9A000000FFFF
 
     ; DATA SEGMENT DPL = 0
@@ -164,21 +165,21 @@ gdt_base:
         ;p_dpl_type      db  96h ; 0b10010010
         ;g_b_0_avl       db  CFh ; 0b11001111
         ;base3124        db  00 
-
+    .data:
 	dq 0x00CF92000000FFFF
 
-gdt:
-	dw (gdt - gdt_base) - 1
-	dd gdt_base
+    .pointer:
+    	dw $ - gdt - 1
+    	dd gdt
 
 ; (C x TH x TS) + (H x TS) + (S - 1) = LBA
 ; DAP : Disk Address Packet
 DAP:
-    dap_size:   db   10h
-    unused:     db   00h
-    sec2read:   dw   01h
-    buffer:     dw   MAIN_OFFSET, MAIN_SEGMENT
-    lba:        dq   MAIN_LBA
+    .dap_size:   db   10h
+    .unused:     db   00h
+    .sec2read:   dw   01h
+    .buffer:     dw   MAIN_OFFSET, MAIN_SEGMENT
+    .lba:        dq   MAIN_LBA
 
 main_success    db  "[STAGE0] Loaded main successfully", 13, 10, 0
 drive_error     db  "[STAGE0] Something went wrong with a disk op :(", 13, 10, 0

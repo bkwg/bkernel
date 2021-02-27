@@ -1,6 +1,7 @@
 #include <stdint.h>
 
 #define SPACE_CHAR   0x20
+#define COM1_MMIO    0xB8000
 
 void cls(void)
 {
@@ -15,7 +16,7 @@ void cls(void)
 
 void hlt(void)
 {
-    uint8_t*   COM1 = (uint8_t*)0xB8000;
+    uint8_t*   COM1 = (uint8_t*)COM1_MMIO;
     char*   p    = "|/-\\";
 
     for (uint8_t i = 0;;)
